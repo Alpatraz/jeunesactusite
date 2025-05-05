@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { firestore } from './firebase-config'; // Assurez-vous que le chemin est correct
+import { firestore } from './firebase-config';
+import Header from './components/Header'; // Assurez-vous que le chemin est correct
+import Footer from './components/Footer'; // Assurez-vous que le chemin est correct
+import Filters from './components/Filters'; // Si vous avez un composant Filters
+import NewsList from './components/NewsList'; // Composant pour afficher les articles
 
 function App() {
   const [news, setNews] = useState([]);
@@ -16,12 +20,17 @@ function App() {
 
   return (
     <div className="App">
+      <Header /> {/* Affichage du Header */}
+      
       <h1>Latest News</h1>
-      <ul>
-        {news.map((item, index) => (
-          <li key={index}>{item.title}</li>
-        ))}
-      </ul>
+
+      {/* Affichage des filtres */}
+      <Filters />
+
+      {/* Liste des articles */}
+      <NewsList news={news} />
+
+      <Footer /> {/* Affichage du Footer */}
     </div>
   );
 }
