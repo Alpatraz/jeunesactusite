@@ -1,21 +1,26 @@
 {
     "name": "jeunesactu",
     "version": "1.0.0",
+    "private": true,
     "dependencies": {
-        "firebase": "^11.6.1",
-        "react": "^17.0.0",
-        "react-dom": "^17.0.0",
-        "react-router-dom": "^5.2.0",
-        "react-scripts": "^4.0.0"
-    },
-    "devDependencies": {
-        "eslint": "^7.32.0",
-        "eslint-plugin-react": "^7.25.0"
+      "firebase": "^9.6.1",
+      "react": "^17.0.2",
+      "react-dom": "^17.0.2",
+      "react-scripts": "^5.0.0",
+      "react-router-dom": "^5.3.0"
     },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject"
-    }
-}
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test",
+      "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+      "extends": [
+        "react-app",
+        "react-app/jest"
+      ]
+    },
+    "browserslist": "> 0.2%, last 2 versions, not dead"
+  }
+  

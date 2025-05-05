@@ -1,25 +1,22 @@
+// Importation des modules nécessaires de Firebase
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 
-import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import HomePage from "./HomePage";
-import ResultsPage from "./ResultsPage";
-import MapPage from "./MapPage";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-
-const App = () => {
-  return (
-    <Router>
-      <Header />
-      <Switch>
-        <Route exact path="/" component={HomePage} />
-        <Route path="/results" component={ResultsPage} />
-        <Route path="/map" component={MapPage} />
-      </Switch>
-      <Footer />
-    </Router>
-  );
+// Configuration de Firebase
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
-export default App;
-    
+// Initialisation de Firebase
+const app = initializeApp(firebaseConfig);
+
+// Récupérer l'instance de Firestore
+const firestore = getFirestore(app);
+
+// Exporter firestore
+export { firestore };
