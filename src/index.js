@@ -1,14 +1,12 @@
+// src/index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css'; // Assurez-vous que cette ligne est présente
+import App from './App';
 
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./App";
-import { BrowserRouter as Router } from "react-router-dom";
-
-// Rendu de l'application sur le DOM
 ReactDOM.render(
-  <Router>
+  <React.StrictMode>
     <App />
-  </Router>,
-  document.getElementById("root")
+  </React.StrictMode>,
+  document.getElementById('root')
 );

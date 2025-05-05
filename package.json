@@ -2,10 +2,11 @@
     "name": "jeunesactu",
     "version": "1.0.0",
     "dependencies": {
+        "firebase": "^11.6.1",
         "react": "^17.0.0",
         "react-dom": "^17.0.0",
-        "react-scripts": "^4.0.0",
-        "react-router-dom": "^5.2.0"
+        "react-router-dom": "^5.2.0",
+        "react-scripts": "^4.0.0"
     },
     "devDependencies": {
         "eslint": "^7.32.0",
