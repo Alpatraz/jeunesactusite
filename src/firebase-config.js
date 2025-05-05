@@ -1,22 +1,19 @@
-// Importation des modules nécessaires de Firebase
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 
-// Configuration de Firebase
+// Configuration Firebase
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyD6G2PXLU6G95SDtUVVKzeqKFhH6Aahq44",
+  authDomain: "zoom-actu.firebaseapp.com",
+  projectId: "zoom-actu",
+  storageBucket: "zoom-actu.firebasestorage.app",
+  messagingSenderId: "174263526950",
+  appId: "1:174263526950:web:e5c52d59b3e9c16e26e8e7",
 };
 
 // Initialisation de Firebase
 const app = initializeApp(firebaseConfig);
-
-// Récupérer l'instance de Firestore
 const firestore = getFirestore(app);
 
-// Exporter firestore
+// Exportation de la connexion à Firestore
 export { firestore };

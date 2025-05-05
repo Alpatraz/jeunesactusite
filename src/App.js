@@ -1,77 +1,144 @@
 import React, { useState, useEffect } from 'react';
-import { firestore } from './firebase-config';
-import NewsList from './components/NewsList';
+import { firestore } from './firebase-config'; // Assurez-vous que firestore est correctement exporté depuis votre fichier firebase-config.js
+import { collection, getDocs } from 'firebase/firestore'; // Utilisation de la nouvelle API modulaire de Firebase v9+
 
 function App() {
   const [news, setNews] = useState([]);
   const [filteredNews, setFilteredNews] = useState([]);
-  
-  // États pour les filtres
-  const [regionFilter, setRegionFilter] = useState('');
-  const [themeFilter, setThemeFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+
+  const [regionFilter, setRegionFilter] = useState(''); // Valeur par défaut (tous)
+  const [themeFilter, setThemeFilter] = useState(''); // Valeur par défaut (tous)
+  const [dateFilter, setDateFilter] = useState(''); // Valeur par défaut (tous)
+  const [searchQuery, setSearchQuery] = useState(''); // Recherche personnalisée
 
   useEffect(() => {
     const getNews = async () => {
-      const newsCollection = await firestore.collection('news').get();
-      const newsData = newsCollection.docs.map(doc => doc.data());
-      setNews(newsData);
+      // Utilisation de la nouvelle méthode modulaire pour obtenir la collection 'actus'
+      const newsCollection = collection(firestore, 'actus');
+      const newsSnapshot = await getDocs(newsCollection);
+      const newsData = newsSnapshot.docs.map(doc => doc.data());
+      
+      console.log(newsData); // Affiche les données récupérées dans la console du navigateur
+
+      setNews(newsData); // Met à jour l'état avec les données récupérées
     };
 
     getNews();
-  }, []);
+  }, []); // Ce useEffect ne s'exécute qu'une seule fois lors du premier rendu
 
-  // Appliquer les filtres
   useEffect(() => {
     let filtered = news;
 
+    // Filtrage par région
     if (regionFilter) {
-      filtered = filtered.filter(item => item.region === regionFilter);
+      filtered = filtered.filter(item => item.region.toLowerCase().includes(regionFilter.toLowerCase()));
     }
 
+    // Filtrage par thème
     if (themeFilter) {
-      filtered = filtered.filter(item => item.theme === themeFilter);
+      filtered = filtered.filter(item => item.theme.toLowerCase().includes(themeFilter.toLowerCase()));
     }
 
+    // Filtrage par date
     if (dateFilter) {
-      filtered = filtered.filter(item => item.date >= dateFilter);
+      filtered = filtered.filter(item => {
+        const publishedDate = new Date(item.publishedAt);
+        const currentDate = new Date();
+        switch (dateFilter) {
+          case '24h':
+            return (currentDate - publishedDate) < 24 * 60 * 60 * 1000; // 24 heures
+          case '7d':
+            return (currentDate - publishedDate) < 7 * 24 * 60 * 60 * 1000; // 7 jours
+          case '1m':
+            return (currentDate - publishedDate) < 30 * 24 * 60 * 60 * 1000; // 1 mois
+          case 'older':
+            return (currentDate - publishedDate) > 30 * 24 * 60 * 60 * 1000; // Plus vieux
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Recherche personnalisée
+    if (searchQuery) {
+      filtered = filtered.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.summary.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
 
     setFilteredNews(filtered);
-  }, [regionFilter, themeFilter, dateFilter, news]); // Re-filtre chaque fois qu'un filtre change
+  }, [regionFilter, themeFilter, dateFilter, searchQuery, news]);
 
   return (
     <div className="App">
       <h1>Latest News</h1>
 
-      {/* Section de filtres */}
+      {/* Filtre par région */}
       <div>
-        <label>Region:</label>
+        <label>Région:</label>
         <select onChange={(e) => setRegionFilter(e.target.value)} value={regionFilter}>
-          <option value="">All</option>
+          <option value="">Tous</option>
+          <option value="Montréal">Montréal</option>
+          <option value="Québec">Québec</option>
+          <option value="Canada">Canada</option>
+          <option value="États-Unis">États-Unis</option>
+          <option value="France">France</option>
           <option value="Europe">Europe</option>
-          <option value="America">America</option>
-          <option value="Asia">Asia</option>
+          {/* Ajoutez d'autres régions ici */}
         </select>
       </div>
 
+      {/* Filtre par thème */}
       <div>
-        <label>Theme:</label>
+        <label>Thème:</label>
         <select onChange={(e) => setThemeFilter(e.target.value)} value={themeFilter}>
-          <option value="">All</option>
-          <option value="Politics">Politics</option>
-          <option value="Environment">Environment</option>
-          <option value="Sports">Sports</option>
+          <option value="">Tous</option>
+          <option value="politique">Politique</option>
+          <option value="sport">Sport</option>
+          <option value="culture">Culture</option>
+          <option value="économie">Économie</option>
+          {/* Ajoutez d'autres thèmes ici */}
         </select>
       </div>
 
+      {/* Filtre par date */}
       <div>
-        <label>Date (after):</label>
-        <input type="date" onChange={(e) => setDateFilter(e.target.value)} value={dateFilter} />
+        <label>Date:</label>
+        <select onChange={(e) => setDateFilter(e.target.value)} value={dateFilter}>
+          <option value="">Tous</option>
+          <option value="24h">Moins de 24h</option>
+          <option value="7d">Moins de 7 jours</option>
+          <option value="1m">Moins d'un mois</option>
+          <option value="older">Plus vieux</option>
+        </select>
+      </div>
+
+      {/* Recherche personnalisée */}
+      <div>
+        <label>Recherche:</label>
+        <input
+          type="text"
+          placeholder="Rechercher..."
+          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchQuery}
+        />
       </div>
 
       {/* Affichage des résultats filtrés */}
-      <NewsList news={filteredNews} />
+      <ul>
+        {filteredNews.length === 0 ? (
+          <li>Aucun résultat trouvé</li>
+        ) : (
+          filteredNews.map((item, index) => (
+            <li key={index}>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+              <p><a href={item.url} target="_blank" rel="noopener noreferrer">Lire plus</a></p>
+            </li>
+          ))
+        )}
+      </ul>
     </div>
   );
 }
