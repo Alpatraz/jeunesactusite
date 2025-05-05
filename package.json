@@ -1,0 +1,20 @@
+{
+    "name": "jeunesactu",
+    "version": "1.0.0",
+    "dependencies": {
+        "react": "^17.0.0",
+        "react-dom": "^17.0.0",
+        "react-scripts": "^4.0.0",
+        "react-router-dom": "^5.2.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.32.0",
+        "eslint-plugin-react": "^7.25.0"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject"
+    }
+}
