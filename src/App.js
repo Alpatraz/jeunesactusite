@@ -11,6 +11,7 @@ function App() {
   const [dateFilter, setDateFilter] = useState(''); // Valeur par défaut (tous)
   const [searchQuery, setSearchQuery] = useState(''); // Recherche personnalisée
 
+  // Fonction pour récupérer les actualités
   useEffect(() => {
     const getNews = async () => {
       // Utilisation de la nouvelle méthode modulaire pour obtenir la collection 'actus'
@@ -18,7 +19,7 @@ function App() {
       const newsSnapshot = await getDocs(newsCollection);
       const newsData = newsSnapshot.docs.map(doc => doc.data());
       
-      console.log(newsData); // Affiche les données récupérées dans la console du navigateur
+      console.log("Données récupérées :", newsData); // Affiche les données récupérées dans la console du navigateur
 
       setNews(newsData); // Met à jour l'état avec les données récupérées
     };
@@ -26,25 +27,21 @@ function App() {
     getNews();
   }, []); // Ce useEffect ne s'exécute qu'une seule fois lors du premier rendu
 
+  // Filtrage des actualités en fonction des filtres
   useEffect(() => {
     let filtered = news;
 
     // Filtrage par région
     if (regionFilter) {
-      filtered = filtered.filter(item => {
-        console.log('Region filter:', item.region); // Affiche les régions de chaque article
-        return item.region.toLowerCase().includes(regionFilter.toLowerCase());
-      });
+      filtered = filtered.filter(item => item.region.toLowerCase().includes(regionFilter.toLowerCase()));
+      console.log("Après filtre région :", filtered); // Vérifie les résultats après le filtre de la région
     }
-
-    console.log('Filtered by region:', filtered); // Affiche après le filtrage par région
 
     // Filtrage par thème
     if (themeFilter) {
       filtered = filtered.filter(item => item.theme.toLowerCase().includes(themeFilter.toLowerCase()));
+      console.log("Après filtre thème :", filtered); // Vérifie les résultats après le filtre du thème
     }
-
-    console.log('Filtered by theme:', filtered); // Affiche après le filtrage par thème
 
     // Filtrage par date
     if (dateFilter) {
@@ -64,9 +61,8 @@ function App() {
             return true;
         }
       });
+      console.log("Après filtre date :", filtered); // Vérifie les résultats après le filtre de la date
     }
-
-    console.log('Filtered by date:', filtered); // Affiche après le filtrage par date
 
     // Recherche personnalisée
     if (searchQuery) {
@@ -74,9 +70,8 @@ function App() {
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.summary.toLowerCase().includes(searchQuery.toLowerCase())
       );
+      console.log("Après recherche personnalisée :", filtered); // Vérifie les résultats après la recherche personnalisée
     }
-
-    console.log('Filtered by search query:', filtered); // Affiche après la recherche personnalisée
 
     setFilteredNews(filtered);
   }, [regionFilter, themeFilter, dateFilter, searchQuery, news]);
