@@ -17,7 +17,7 @@ function App() {
       const newsCollection = collection(firestore, 'actus');
       const newsSnapshot = await getDocs(newsCollection);
       const newsData = newsSnapshot.docs.map(doc => doc.data());
-      
+
       console.log("Données récupérées :", newsData); // Affiche les données récupérées dans la console du navigateur
 
       setNews(newsData); // Met à jour l'état avec les données récupérées
@@ -29,9 +29,10 @@ function App() {
   useEffect(() => {
     let filtered = news;
 
-    // Filtrage par région
     console.log("Valeur du filtre région :", regionFilter); // Affiche la valeur du filtre région dans la console
-    if (regionFilter) {
+
+    // Filtrage par région
+    if (regionFilter && regionFilter !== "") {
       filtered = filtered.filter(item => item.region.toLowerCase().includes(regionFilter.toLowerCase()));
     } else {
       console.log("Pas de filtre région appliqué, affichage de toutes les actualités.");
@@ -82,7 +83,10 @@ function App() {
         {/* Filtre par région */}
         <div>
           <label>Région:</label>
-          <select onChange={(e) => setRegionFilter(e.target.value)} value={regionFilter}>
+          <select 
+            onChange={(e) => setRegionFilter(e.target.value)} 
+            value={regionFilter}
+          >
             <option value="">Tous</option>
             <option value="Montréal">Montréal</option>
             <option value="Québec">Québec</option>
