@@ -31,10 +31,15 @@ function App() {
   useEffect(() => {
     let filtered = news;
 
+    // Vérifier la valeur du filtre région avant le filtrage
+    console.log("Valeur du filtre région :", regionFilter);
+
     // Filtrage par région
     if (regionFilter) {
       filtered = filtered.filter(item => item.region.toLowerCase().includes(regionFilter.toLowerCase()));
       console.log("Après filtre région :", filtered); // Vérifie les résultats après le filtre de la région
+    } else {
+      console.log("Pas de filtre région appliqué, affichage de toutes les actualités.");
     }
 
     // Filtrage par thème
