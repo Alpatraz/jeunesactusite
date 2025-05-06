@@ -33,7 +33,11 @@ function App() {
 
     // Filtrage par région
     if (regionFilter && regionFilter !== "") {
-      filtered = filtered.filter(item => item.region.toLowerCase().includes(regionFilter.toLowerCase()));
+      filtered = filtered.filter(item => {
+        // Vérifier que "region" est défini avant d'appliquer toLowerCase
+        const region = item.region ? item.region.toLowerCase() : '';
+        return region.includes(regionFilter.toLowerCase());
+      });
     } else {
       console.log("Pas de filtre région appliqué, affichage de toutes les actualités.");
     }
