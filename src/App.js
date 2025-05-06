@@ -31,13 +31,20 @@ function App() {
 
     // Filtrage par région
     if (regionFilter) {
-      filtered = filtered.filter(item => item.region.toLowerCase().includes(regionFilter.toLowerCase()));
+      filtered = filtered.filter(item => {
+        console.log('Region filter:', item.region); // Affiche les régions de chaque article
+        return item.region.toLowerCase().includes(regionFilter.toLowerCase());
+      });
     }
+
+    console.log('Filtered by region:', filtered); // Affiche après le filtrage par région
 
     // Filtrage par thème
     if (themeFilter) {
       filtered = filtered.filter(item => item.theme.toLowerCase().includes(themeFilter.toLowerCase()));
     }
+
+    console.log('Filtered by theme:', filtered); // Affiche après le filtrage par thème
 
     // Filtrage par date
     if (dateFilter) {
@@ -59,6 +66,8 @@ function App() {
       });
     }
 
+    console.log('Filtered by date:', filtered); // Affiche après le filtrage par date
+
     // Recherche personnalisée
     if (searchQuery) {
       filtered = filtered.filter(item =>
@@ -67,62 +76,65 @@ function App() {
       );
     }
 
+    console.log('Filtered by search query:', filtered); // Affiche après la recherche personnalisée
+
     setFilteredNews(filtered);
   }, [regionFilter, themeFilter, dateFilter, searchQuery, news]);
 
   return (
     <div className="App">
-      <h1>Latest News</h1>
+      <h1>Dernières actus</h1>
 
-      {/* Filtre par région */}
-      <div>
-        <label>Région:</label>
-        <select onChange={(e) => setRegionFilter(e.target.value)} value={regionFilter}>
-          <option value="">Tous</option>
-          <option value="Montréal">Montréal</option>
-          <option value="Québec">Québec</option>
-          <option value="Canada">Canada</option>
-          <option value="États-Unis">États-Unis</option>
-          <option value="France">France</option>
-          <option value="Europe">Europe</option>
-          {/* Ajoutez d'autres régions ici */}
-        </select>
-      </div>
+      {/* Conteneur des filtres */}
+      <div className="filters-container">
+        {/* Filtre par région */}
+        <div>
+          <label>Région:</label>
+          <select onChange={(e) => setRegionFilter(e.target.value)} value={regionFilter}>
+            <option value="">Tous</option>
+            <option value="Montréal">Montréal</option>
+            <option value="Québec">Québec</option>
+            <option value="Canada">Canada</option>
+            <option value="États-Unis">États-Unis</option>
+            <option value="France">France</option>
+            <option value="Europe">Europe</option>
+          </select>
+        </div>
 
-      {/* Filtre par thème */}
-      <div>
-        <label>Thème:</label>
-        <select onChange={(e) => setThemeFilter(e.target.value)} value={themeFilter}>
-          <option value="">Tous</option>
-          <option value="politique">Politique</option>
-          <option value="sport">Sport</option>
-          <option value="culture">Culture</option>
-          <option value="économie">Économie</option>
-          {/* Ajoutez d'autres thèmes ici */}
-        </select>
-      </div>
+        {/* Filtre par thème */}
+        <div>
+          <label>Thème:</label>
+          <select onChange={(e) => setThemeFilter(e.target.value)} value={themeFilter}>
+            <option value="">Tous</option>
+            <option value="politique">Politique</option>
+            <option value="sport">Sport</option>
+            <option value="culture">Culture</option>
+            <option value="économie">Économie</option>
+          </select>
+        </div>
 
-      {/* Filtre par date */}
-      <div>
-        <label>Date:</label>
-        <select onChange={(e) => setDateFilter(e.target.value)} value={dateFilter}>
-          <option value="">Tous</option>
-          <option value="24h">Moins de 24h</option>
-          <option value="7d">Moins de 7 jours</option>
-          <option value="1m">Moins d'un mois</option>
-          <option value="older">Plus vieux</option>
-        </select>
-      </div>
+        {/* Filtre par date */}
+        <div>
+          <label>Date:</label>
+          <select onChange={(e) => setDateFilter(e.target.value)} value={dateFilter}>
+            <option value="">Tous</option>
+            <option value="24h">Moins de 24h</option>
+            <option value="7d">Moins de 7 jours</option>
+            <option value="1m">Moins d'un mois</option>
+            <option value="older">Plus vieux</option>
+          </select>
+        </div>
 
-      {/* Recherche personnalisée */}
-      <div>
-        <label>Recherche:</label>
-        <input
-          type="text"
-          placeholder="Rechercher..."
-          onChange={(e) => setSearchQuery(e.target.value)}
-          value={searchQuery}
-        />
+        {/* Recherche personnalisée */}
+        <div>
+          <label>Recherche:</label>
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+          />
+        </div>
       </div>
 
       {/* Affichage des résultats filtrés */}
