@@ -11,7 +11,6 @@ function App() {
   const [dateFilter, setDateFilter] = useState(''); // Valeur par défaut (tous)
   const [searchQuery, setSearchQuery] = useState(''); // Recherche personnalisée
 
-  // Fonction pour récupérer les actualités
   useEffect(() => {
     const getNews = async () => {
       // Utilisation de la nouvelle méthode modulaire pour obtenir la collection 'actus'
@@ -27,17 +26,13 @@ function App() {
     getNews();
   }, []); // Ce useEffect ne s'exécute qu'une seule fois lors du premier rendu
 
-  // Filtrage des actualités en fonction des filtres
   useEffect(() => {
     let filtered = news;
 
-    // Vérifier la valeur du filtre région avant le filtrage
-    console.log("Valeur du filtre région :", regionFilter);
-
     // Filtrage par région
+    console.log("Valeur du filtre région :", regionFilter); // Affiche la valeur du filtre région dans la console
     if (regionFilter) {
       filtered = filtered.filter(item => item.region.toLowerCase().includes(regionFilter.toLowerCase()));
-      console.log("Après filtre région :", filtered); // Vérifie les résultats après le filtre de la région
     } else {
       console.log("Pas de filtre région appliqué, affichage de toutes les actualités.");
     }
@@ -45,7 +40,6 @@ function App() {
     // Filtrage par thème
     if (themeFilter) {
       filtered = filtered.filter(item => item.theme.toLowerCase().includes(themeFilter.toLowerCase()));
-      console.log("Après filtre thème :", filtered); // Vérifie les résultats après le filtre du thème
     }
 
     // Filtrage par date
@@ -66,7 +60,6 @@ function App() {
             return true;
         }
       });
-      console.log("Après filtre date :", filtered); // Vérifie les résultats après le filtre de la date
     }
 
     // Recherche personnalisée
@@ -75,7 +68,6 @@ function App() {
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.summary.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      console.log("Après recherche personnalisée :", filtered); // Vérifie les résultats après la recherche personnalisée
     }
 
     setFilteredNews(filtered);
