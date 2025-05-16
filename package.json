@@ -1,0 +1,25 @@
+{
+    "name": "jeunesactu",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+        "firebase": "^9.6.1",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-router-dom": "^6.30.0",
+        "react-scripts": "^5.0.0"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    },
+    "browserslist": "> 0.2%, last 2 versions, not dead"
+}

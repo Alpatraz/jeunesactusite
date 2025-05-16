@@ -1,0 +1,342 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f7f7f7;
+}
+
+.App {
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+nav {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 0;
+}
+
+.nav-button {
+  background-color: #0077cc;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.nav-button:hover {
+  background-color: #005fa3;
+}
+
+h1, h2, h3 {
+  text-align: center;
+  color: #333;
+}
+
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.filters-container > div {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.filters-container label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.filters-container select,
+.filters-container input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.summary-box {
+  background-color: #eaf5ff;
+  padding: 15px;
+  border-left: 4px solid #0077cc;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.card-list {
+  list-style: none;
+  padding: 0;
+}
+
+.news-card {
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.news-card h4 {
+  margin-top: 0;
+  color: #0077cc;
+}
+
+.news-card a {
+  display: inline-block;
+  margin-top: 10px;
+  text-decoration: none;
+  color: #0077cc;
+  font-weight: bold;
+}
+
+.news-card a:hover {
+  text-decoration: underline;
+}
+
+/* === STYLES POUR LES JEUX D'ACTUALITÉ === */
+
+.choice {
+  cursor: pointer;
+  padding: 10px;
+  margin-bottom: 8px;
+  background-color: #f1f1f1;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+}
+.choice:hover {
+  background-color: #e0e0e0;
+}
+.choice.correct {
+  background-color: #d4edda;
+  border-left: 5px solid #28a745;
+}
+.choice.incorrect {
+  background-color: #f8d7da;
+  border-left: 5px solid #dc3545;
+}
+.quiz-box, .result-box, .explanation-box {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.quiz-options button {
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.quiz-options button:hover {
+  background-color: #005fa3;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #0077cc;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.quiz-container {
+  margin-top: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.question-card h2 {
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.option-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #eef2f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.option-button:hover {
+  background-color: #d6e4f2;
+}
+
+.option-button.correct {
+  background-color: #d4edda;
+  border-left: 5px solid #28a745;
+  color: #155724;
+}
+
+.option-button.incorrect {
+  background-color: #f8d7da;
+  border-left: 5px solid #dc3545;
+  color: #721c24;
+}
+
+.score-display {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  color: #0077cc;
+}
+
+.refresh-button {
+  margin-top: 25px;
+  background-color: #0077cc;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.refresh-button:hover {
+  background-color: #005fa3;
+}
+
+.loading-spinner {
+  text-align: center;
+  font-size: 18px;
+  color: #0077cc;
+  margin-top: 40px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+.error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid #dc3545;
+  font-weight: bold;
+  margin-top: 30px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.age-filter-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.age-filter-container label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.age-filter-container input {
+  width: 80px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+/* === SECTION ÂGE ET INSTRUCTIONS === */
+
+.quiz-instructions {
+  margin-top: 30px;
+  background-color: #fff4e6;
+  border-left: 5px solid #ffa500;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-size: 16px;
+  animation: fadeIn 0.6s ease;
+}
+
+.age-filter-container {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.age-filter-container input {
+  width: 80px;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: border-color 0.3s;
+}
+
+.age-filter-container input:focus {
+  border-color: #0077cc;
+  outline: none;
+}
+
+.quiz-instructions p {
+  margin: 0 0 10px;
+  font-size: 17px;
+  color: #444;
+}
+
+/* === EFFET DE TRANSITION === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
