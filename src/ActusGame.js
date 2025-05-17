@@ -32,26 +32,26 @@ function ActusGame() {
           'X-Title': 'ZoomActu'
         },
         body: JSON.stringify({
-          model: 'mistralai/mistral-7b-instruct',
+          model: process.env.REACT_APP_OPENROUTER_MODEL,
           messages: [
             {
               role: 'user',
-              content: `Tu es un professeur qui crée un quiz d'actualité pour une personne de ${age} ans. 
-Génère 3 questions basées sur l'actualité des 7 derniers jours. Pour chaque question, fournis :
-- la question,
-- 3 choix de réponses (A, B, C),
-- la bonne réponse (A/B/C),
-- une explication claire et courte.
+              content: `Tu es un professeur qui crée un quiz d'actualité pour une personne de ${age} ans.
+Génère exactement 3 questions basées uniquement sur des faits d’actualité des 7 derniers jours (depuis aujourd’hui).
+Pour chaque question, retourne :
+- la question
+- 3 choix (A, B, C)
+- la bonne réponse (A/B/C)
+- une explication courte
 
-Format JSON strict : 
+Format JSON strict :
 [
   {
     "question": "...",
     "choices": ["...", "...", "..."],
     "answer": "A",
     "explanation": "..."
-  },
-  ...
+  }
 ]`
             }
           ],
@@ -60,19 +60,24 @@ Format JSON strict :
       });
 
       const data = await response.json();
-      const text = data?.choices?.[0]?.message?.content;
+      const rawText = data?.choices?.[0]?.message?.content;
 
-      if (!text) {
-        setError("Pas de contenu reçu.");
-        setLoading(false);
+      if (!rawText) {
+        setError("❌ Aucune donnée reçue.");
         return;
       }
 
-      const parsed = JSON.parse(text);
+      const cleanedText = rawText
+        .replace(/(\r\n|\n|\r)/gm, '')
+        .replace(/(\w+):/g, '"$1":')
+        .replace(/“|”/g, '"');
+
+      const parsed = JSON.parse(cleanedText);
       setQuestions(parsed);
+
     } catch (err) {
       console.error('Erreur lors de la génération du quiz :', err);
-      setError("Erreur lors de la génération du quiz.");
+      setError("❌ Erreur de format : impossible de lire les questions générées.");
     } finally {
       setLoading(false);
     }
@@ -102,7 +107,7 @@ Format JSON strict :
 
       {!quizStarted && (
         <div className="quiz-instructions">
-          <p>Avant de commencer, entre ton âge pour que les questions soient adaptées.</p>
+          <p>🎯 Entrez votre âge pour générer un quiz d’actualité des 7 derniers jours, adapté à votre niveau.</p>
           <div className="age-filter-container">
             <label>Ton âge :</label>
             <input

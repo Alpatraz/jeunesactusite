@@ -1,16 +1,17 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Navbar.css';
 
-const Navbar = () => {
+function Navbar() {
   return (
-    <nav className="navbar">
-      <NavLink exact="true" to="/" activeclassname="active">Résumé</NavLink>
-      <NavLink to="/jeu" activeclassname="active">Jeux</NavLink>
-      <NavLink to="/carte" activeclassname="active">Carte du monde</NavLink>
-      <NavLink to="/dossiers" activeclassname="active">Dossiers</NavLink>
+    <nav>
+      <Link to="/" className="nav-button">Résumé</Link>
+      <Link to="/jeu" className="nav-button">Jeu</Link>
+      <Link to="/dossiers" className="nav-button">Dossiers</Link>
+      <Link to="/carte" className="nav-button">Carte</Link>
+      <Link to="/sources" className="nav-button">Sources</Link>
     </nav>
   );
-};
+}
 
 export default Navbar;

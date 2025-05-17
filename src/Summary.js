@@ -11,6 +11,7 @@ function Summary() {
   const [dateFilter, setDateFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [summary, setSummary] = useState('Chargement du résumé...');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getNews = async () => {
@@ -19,7 +20,6 @@ function Summary() {
       const newsData = newsSnapshot.docs.map(doc => doc.data());
       setNews(newsData);
     };
-
     getNews();
   }, []);
 
@@ -63,41 +63,48 @@ function Summary() {
     }
 
     setFilteredNews(filtered);
-    generateSummary(filtered);
+    if (filtered.length > 0) {
+      generateSummary(filtered);
+    } else {
+      setSummary("Aucun article ne correspond à votre sélection.");
+    }
   }, [regionFilter, themeFilter, dateFilter, searchQuery, news]);
 
   const generateSummary = async (filtered) => {
-    const newsText = filtered.map(item => `${item.title}: ${item.summary}`).join(' ');
+    const newsText = filtered.slice(0, 10).map(item => `${item.title}: ${item.summary}`).join('\n');
 
     if (!newsText.trim()) {
-      setSummary("Aucun résumé généré");
+      setSummary("Aucun résumé généré.");
       return;
     }
 
+    setLoading(true);
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`
+          "Authorization": `Bearer ${process.env.REACT_APP_OPENROUTER_API_KEY}`,
+          "HTTP-Referer": "https://zoomactu.netlify.app",
+          "X-Title": "ZoomActu"
         },
         body: JSON.stringify({
-          model: "gpt-3.5-turbo",
+          model: process.env.REACT_APP_OPENROUTER_MODEL || "mistralai/mistral-7b-instruct",
           messages: [
             {
               role: "user",
-              content: `Fournis un résumé des actualités suivantes : ${newsText}`
+              content: `Voici des actualités :\n${newsText}\n\nRédige un résumé concis, clair et en français, adapté à un public général.`
             }
           ],
-          max_tokens: 300,
           temperature: 0.7
         })
       });
 
       const data = await response.json();
+      const result = data?.choices?.[0]?.message?.content;
 
-      if (data.choices && data.choices[0] && data.choices[0].message) {
-        setSummary(data.choices[0].message.content.trim());
+      if (result) {
+        setSummary(result.trim());
       } else {
         console.error("Erreur API:", data);
         setSummary("Erreur : Résumé non généré");
@@ -105,6 +112,8 @@ function Summary() {
     } catch (error) {
       console.error("Erreur de requête:", error);
       setSummary("Erreur : Résumé non généré");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -162,7 +171,7 @@ function Summary() {
 
       <div className="summary-box">
         <h3>Résumé :</h3>
-        <p>{summary}</p>
+        {loading ? <p>⏳ Résumé en cours...</p> : <p>{summary}</p>}
       </div>
 
       <div className="news-grid">
