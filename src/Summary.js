@@ -71,7 +71,11 @@ function Summary() {
   }, [regionFilter, themeFilter, dateFilter, searchQuery, news]);
 
   const generateSummary = async (filtered) => {
-    const newsText = filtered.slice(0, 10).map(item => `${item.title}: ${item.summary}`).join('\n');
+    const newsText = filtered.slice(0, 10).map(item =>
+      `${item.title}: ${item.summary}`
+    ).join('\n');
+
+    console.log("Prompt envoyé :", newsText); // 🐛 Debug pour vérifier le prompt envoyé
 
     if (!newsText.trim()) {
       setSummary("Aucun résumé généré.");
@@ -80,28 +84,16 @@ function Summary() {
 
     setLoading(true);
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const response = await fetch("https://jeunes-actu-guillaumese.replit.app/api/generate-summary", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.REACT_APP_OPENROUTER_API_KEY}`,
-          "HTTP-Referer": "https://zoomactu.netlify.app",
-          "X-Title": "ZoomActu"
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          model: process.env.REACT_APP_OPENROUTER_MODEL || "mistralai/mistral-7b-instruct",
-          messages: [
-            {
-              role: "user",
-              content: `Voici des actualités :\n${newsText}\n\nRédige un résumé concis, clair et en français, adapté à un public général.`
-            }
-          ],
-          temperature: 0.7
-        })
+        body: JSON.stringify({ prompt: newsText })
       });
 
       const data = await response.json();
-      const result = data?.choices?.[0]?.message?.content;
+      const result = data?.summary;
 
       if (result) {
         setSummary(result.trim());

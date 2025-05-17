@@ -23,61 +23,27 @@ function ActusGame() {
     setQuizStarted(true);
 
     try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const response = await fetch('https://jeunes-actu-guillaumese.replit.app/api/generate-quiz', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.REACT_APP_OPENROUTER_API_KEY}`,
-          'HTTP-Referer': 'https://zoomactu.netlify.app',
-          'X-Title': 'ZoomActu'
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          model: process.env.REACT_APP_OPENROUTER_MODEL,
-          messages: [
-            {
-              role: 'user',
-              content: `Tu es un professeur qui crée un quiz d'actualité pour une personne de ${age} ans.
-Génère exactement 3 questions basées uniquement sur des faits d’actualité des 7 derniers jours (depuis aujourd’hui).
-Pour chaque question, retourne :
-- la question
-- 3 choix (A, B, C)
-- la bonne réponse (A/B/C)
-- une explication courte
-
-Format JSON strict :
-[
-  {
-    "question": "...",
-    "choices": ["...", "...", "..."],
-    "answer": "A",
-    "explanation": "..."
-  }
-]`
-            }
-          ],
-          temperature: 0.7
-        })
+        body: JSON.stringify({ age })
       });
 
       const data = await response.json();
-      const rawText = data?.choices?.[0]?.message?.content;
+      const parsed = data.questions;
 
-      if (!rawText) {
-        setError("❌ Aucune donnée reçue.");
+      if (!parsed || !Array.isArray(parsed)) {
+        setError("❌ Format inattendu reçu du serveur.");
         return;
       }
 
-      const cleanedText = rawText
-        .replace(/(\r\n|\n|\r)/gm, '')
-        .replace(/(\w+):/g, '"$1":')
-        .replace(/“|”/g, '"');
-
-      const parsed = JSON.parse(cleanedText);
       setQuestions(parsed);
 
     } catch (err) {
       console.error('Erreur lors de la génération du quiz :', err);
-      setError("❌ Erreur de format : impossible de lire les questions générées.");
+      setError("❌ Erreur : impossible de générer le quiz.");
     } finally {
       setLoading(false);
     }
