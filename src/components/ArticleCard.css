@@ -1,0 +1,57 @@
+/* Style pour les cartes d'articles dans Summary */
+
+.article-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s;
+  }
+  
+  .article-card:hover {
+    transform: scale(1.01);
+  }
+  
+  .article-title {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .article-summary {
+    font-size: 0.875rem;
+    color: #4a5568;
+    margin-bottom: 0.75rem;
+  }
+  
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .article-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    background-color: #edf2f7;
+    color: #2d3748;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .article-link {
+    font-size: 0.875rem;
+    color: #3182ce;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  
+  .article-link:hover {
+    color: #2b6cb0;
+  }
+  

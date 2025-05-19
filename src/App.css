@@ -340,3 +340,9 @@ h1, h2, h3 {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.custom-marker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

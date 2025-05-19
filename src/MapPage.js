@@ -1,55 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 import { firestore } from './firebase-config';
 import { collection, getDocs } from 'firebase/firestore';
-
-// Icône personnalisée simple (on peut améliorer par thème ensuite)
-const defaultIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-  shadowSize: [41, 41]
-});
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import './App.css';
 
 function MapPage() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const snapshot = await getDocs(collection(firestore, 'events'));
-        const data = snapshot.docs.map(doc => doc.data());
-        setEvents(data);
-      } catch (err) {
-        console.error('Erreur de chargement des événements :', err);
-      }
+    const fetchData = async () => {
+      const snapshot = await getDocs(collection(firestore, 'actus'));
+      const data = snapshot.docs
+        .map(doc => doc.data())
+        .filter(item => item.location && item.location.lat && item.location.lng);
+      setEvents(data);
     };
 
-    fetchEvents();
+    fetchData();
   }, []);
 
+  const getIconByTheme = (theme) => {
+    const colors = {
+      "Politique": "blue",
+      "Catastrophe naturelle": "red",
+      "Culture": "purple",
+      "Environnement": "green",
+      "Sport": "orange",
+      "Sécurité": "black",
+    };
+
+    const color = colors[theme] || "gray";
+
+    return L.divIcon({
+      className: "custom-marker",
+      html: `<div style="background-color:${color}; width:18px; height:18px; border-radius:50%; border:2px solid white;"></div>`,
+    });
+  };
+
   return (
-    <div className="App">
-      <h1>Carte des Actualités</h1>
-      <MapContainer center={[48.8566, 2.3522]} zoom={3} style={{ height: '600px', width: '100%' }}>
+    <div className="map-container">
+      <h1>Carte des événements</h1>
+      <MapContainer center={[20, 0]} zoom={2} style={{ height: "80vh", width: "100%" }}>
         <TileLayer
-          attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {events.map((event, idx) => (
+        {events.map((event, index) => (
           <Marker
-            key={idx}
-            position={[event.lat, event.lng]}
-            icon={defaultIcon}
+            key={index}
+            position={[event.location.lat, event.location.lng]}
+            icon={getIconByTheme(event.theme)}
           >
             <Popup>
               <strong>{event.title}</strong><br />
-              {event.description}<br />
-              {event.date && <em>{new Date(event.date).toLocaleDateString()}</em>}
+              <em>{event.summary}</em><br />
+              <a href={event.url} target="_blank" rel="noopener noreferrer">Lire plus</a>
             </Popup>
           </Marker>
         ))}

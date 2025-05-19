@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { firestore } from './firebase-config';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import './App.css';
+import ArticleCard from './components/ArticleCard';
 
 function Summary() {
   const [news, setNews] = useState([]);
@@ -12,13 +13,25 @@ function Summary() {
   const [searchQuery, setSearchQuery] = useState('');
   const [summary, setSummary] = useState('Chargement du résumé...');
   const [loading, setLoading] = useState(false);
+  const [themes, setThemes] = useState([]);
+  const [regions, setRegions] = useState([]);
 
   useEffect(() => {
     const getNews = async () => {
-      const newsCollection = collection(firestore, 'actus');
+      const newsCollection = query(collection(firestore, 'actus'), orderBy("publishedAt", "desc"));
       const newsSnapshot = await getDocs(newsCollection);
       const newsData = newsSnapshot.docs.map(doc => doc.data());
       setNews(newsData);
+
+      // Extraire les thèmes et régions uniques
+      const themeSet = new Set();
+      const regionSet = new Set();
+      newsData.forEach(item => {
+        if (item.theme) themeSet.add(item.theme.trim());
+        if (item.region) regionSet.add(item.region.trim());
+      });
+      setThemes([...themeSet].sort());
+      setRegions([...regionSet].sort());
     };
     getNews();
   }, []);
@@ -75,8 +88,6 @@ function Summary() {
       `${item.title}: ${item.summary}`
     ).join('\n');
 
-    console.log("Prompt envoyé :", newsText); // 🐛 Debug pour vérifier le prompt envoyé
-
     if (!newsText.trim()) {
       setSummary("Aucun résumé généré.");
       return;
@@ -86,21 +97,14 @@ function Summary() {
     try {
       const response = await fetch("https://jeunes-actu-guillaumese.replit.app/api/generate-summary", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: newsText })
       });
 
       const data = await response.json();
       const result = data?.summary;
 
-      if (result) {
-        setSummary(result.trim());
-      } else {
-        console.error("Erreur API:", data);
-        setSummary("Erreur : Résumé non généré");
-      }
+      setSummary(result?.trim() || "Erreur : Résumé non généré");
     } catch (error) {
       console.error("Erreur de requête:", error);
       setSummary("Erreur : Résumé non généré");
@@ -118,12 +122,9 @@ function Summary() {
           <label>Région:</label>
           <select onChange={(e) => setRegionFilter(e.target.value)} value={regionFilter}>
             <option value="">Tous</option>
-            <option value="Montréal">Montréal</option>
-            <option value="Québec">Québec</option>
-            <option value="Canada">Canada</option>
-            <option value="États-Unis">États-Unis</option>
-            <option value="France">France</option>
-            <option value="Europe">Europe</option>
+            {regions.map((region, idx) => (
+              <option key={idx} value={region}>{region}</option>
+            ))}
           </select>
         </div>
 
@@ -131,10 +132,9 @@ function Summary() {
           <label>Thème:</label>
           <select onChange={(e) => setThemeFilter(e.target.value)} value={themeFilter}>
             <option value="">Tous</option>
-            <option value="politique">Politique</option>
-            <option value="sport">Sport</option>
-            <option value="culture">Culture</option>
-            <option value="économie">Économie</option>
+            {themes.map((theme, idx) => (
+              <option key={idx} value={theme}>{theme}</option>
+            ))}
           </select>
         </div>
 
@@ -168,11 +168,7 @@ function Summary() {
 
       <div className="news-grid">
         {filteredNews.map((item, index) => (
-          <div key={index} className="news-card">
-            <h4>{item.title}</h4>
-            <p>{item.summary}</p>
-            <p><a href={item.url} target="_blank" rel="noopener noreferrer">Lire plus</a></p>
-          </div>
+          <ArticleCard key={index} {...item} />
         ))}
       </div>
     </div>
