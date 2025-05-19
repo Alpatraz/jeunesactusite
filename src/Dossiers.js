@@ -22,6 +22,7 @@ function Dossiers() {
       return titleMatch || summaryMatch;
     });
 
+    filtered.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
     setArticles(filtered);
   };
 

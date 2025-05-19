@@ -23,7 +23,7 @@ function Summary() {
       const newsData = newsSnapshot.docs.map(doc => doc.data());
       setNews(newsData);
 
-      // Extraire les thèmes et régions uniques
+      // Extraire thèmes et régions uniques
       const themeSet = new Set();
       const regionSet = new Set();
       newsData.forEach(item => {
@@ -122,8 +122,8 @@ function Summary() {
           <label>Région:</label>
           <select onChange={(e) => setRegionFilter(e.target.value)} value={regionFilter}>
             <option value="">Tous</option>
-            {regions.map((region, idx) => (
-              <option key={idx} value={region}>{region}</option>
+            {regions.map((r, i) => (
+              <option key={i} value={r}>{r}</option>
             ))}
           </select>
         </div>
@@ -132,8 +132,8 @@ function Summary() {
           <label>Thème:</label>
           <select onChange={(e) => setThemeFilter(e.target.value)} value={themeFilter}>
             <option value="">Tous</option>
-            {themes.map((theme, idx) => (
-              <option key={idx} value={theme}>{theme}</option>
+            {themes.map((t, i) => (
+              <option key={i} value={t}>{t}</option>
             ))}
           </select>
         </div>

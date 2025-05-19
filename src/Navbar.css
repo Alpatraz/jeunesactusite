@@ -1,22 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&display=swap');
+
 .navbar {
+  background: linear-gradient(to right, #805ad5, #d53f8c);
+  padding: 1rem;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: white;
+  text-align: left;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo span {
+  color: #fbd38d;
+}
+
+.logo-icon {
+  font-size: 1.8rem;
+  margin-right: 0.25rem;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: white;
+  cursor: pointer;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: #6b46c1;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .nav-links.open {
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 15px;
-    background-color: #f0f0f0;
-    border-bottom: 1px solid #ddd;
   }
-  
-  .navbar a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    padding: 6px 12px;
-    border-radius: 5px;
+
+  .nav-links a {
+    padding: 0.75rem 0;
+    text-align: center;
   }
-  
-  .navbar a.active {
-    background-color: #007bff;
-    color: white;
-  }
-  
+}
