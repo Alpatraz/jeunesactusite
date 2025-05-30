@@ -9,12 +9,16 @@ function Summary() {
   const [filteredNews, setFilteredNews] = useState([]);
   const [regionFilter, setRegionFilter] = useState('');
   const [themeFilter, setThemeFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState('24h'); // filtre par défaut
   const [searchQuery, setSearchQuery] = useState('');
+  const [age, setAge] = useState(9);
   const [summary, setSummary] = useState('Chargement du résumé...');
   const [loading, setLoading] = useState(false);
   const [themes, setThemes] = useState([]);
   const [regions, setRegions] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [articlesPerPage, setArticlesPerPage] = useState(10);
 
   useEffect(() => {
     const getNews = async () => {
@@ -23,7 +27,6 @@ function Summary() {
       const newsData = newsSnapshot.docs.map(doc => doc.data());
       setNews(newsData);
 
-      // Extraire thèmes et régions uniques
       const themeSet = new Set();
       const regionSet = new Set();
       newsData.forEach(item => {
@@ -75,35 +78,59 @@ function Summary() {
       );
     }
 
+    setCurrentPage(1);
     setFilteredNews(filtered);
     if (filtered.length > 0) {
       generateSummary(filtered);
     } else {
       setSummary("Aucun article ne correspond à votre sélection.");
     }
-  }, [regionFilter, themeFilter, dateFilter, searchQuery, news]);
+  }, [regionFilter, themeFilter, dateFilter, searchQuery, news, age]);
 
   const generateSummary = async (filtered) => {
-    const newsText = filtered.slice(0, 10).map(item =>
-      `${item.title}: ${item.summary}`
-    ).join('\n');
-
-    if (!newsText.trim()) {
+    if (!filtered || filtered.length === 0) {
       setSummary("Aucun résumé généré.");
       return;
     }
+
+    // Intro dynamique selon les filtres
+    let intro = "📰 Voici ce qui s’est passé récemment dans le monde :";
+
+    if (regionFilter && themeFilter) {
+      intro = `🌍 Voici les nouvelles sur **${themeFilter}** en **${regionFilter}**, ces derniers jours :`;
+    } else if (regionFilter) {
+      intro = `🌍 Voici ce qui s’est passé récemment en **${regionFilter}** :`;
+    } else if (themeFilter) {
+      intro = `📌 Voici les dernières nouvelles dans le domaine **${themeFilter}** :`;
+    }
+
+    if (dateFilter === '24h') intro += ` (moins de 24h)`;
+    if (dateFilter === '7d') intro += ` (cette semaine)`;
+    if (dateFilter === '1m') intro += ` (ce mois-ci)`;
+
+    const groupedByTheme = {};
+    filtered.slice(0, 15).forEach(item => {
+      const theme = item.theme?.trim() || "Autres";
+      if (!groupedByTheme[theme]) groupedByTheme[theme] = [];
+      groupedByTheme[theme].push(`- ${item.title}`);
+    });
+
+    const thematicBlocks = Object.entries(groupedByTheme).map(([theme, articles]) => {
+      return `\n\n🟢 ${theme}\n${articles.slice(0, 3).join('\n')}`;
+    }).join('');
+
+    const fullPrompt = `Résume les actualités suivantes pour un enfant de ${age} ans. Utilise un langage clair et adapté à son âge. Conserve les thèmes séparés.\n\n${intro}\n${thematicBlocks}`;
 
     setLoading(true);
     try {
       const response = await fetch("https://jeunes-actu-guillaumese.replit.app/api/generate-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: newsText })
+        body: JSON.stringify({ prompt: fullPrompt })
       });
 
       const data = await response.json();
       const result = data?.summary;
-
       setSummary(result?.trim() || "Erreur : Résumé non généré");
     } catch (error) {
       console.error("Erreur de requête:", error);
@@ -113,11 +140,29 @@ function Summary() {
     }
   };
 
+  // Pagination
+  const indexOfLastArticle = currentPage * articlesPerPage;
+  const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
+  const currentArticles = filteredNews.slice(indexOfFirstArticle, indexOfLastArticle);
+  const totalPages = Math.ceil(filteredNews.length / articlesPerPage);
+
   return (
     <div className="Summary">
       <h1>Résumé de l'actualité</h1>
 
       <div className="filters-container">
+        <div>
+          <label>Âge :</label>
+          <input
+            type="number"
+            value={age}
+            onChange={(e) => setAge(Number(e.target.value))}
+            min={6}
+            max={17}
+            style={{ width: "60px" }}
+          />
+        </div>
+
         <div>
           <label>Région:</label>
           <select onChange={(e) => setRegionFilter(e.target.value)} value={regionFilter}>
@@ -157,20 +202,42 @@ function Summary() {
             value={searchQuery}
           />
         </div>
+
+        <div>
+          <label>Articles par page :</label>
+          <select value={articlesPerPage} onChange={(e) => setArticlesPerPage(Number(e.target.value))}>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </div>
       </div>
 
-      <h2>Nombre d'articles : {filteredNews.length}</h2>
+      <h2>Articles trouvés : {filteredNews.length}</h2>
 
       <div className="summary-box">
         <h3>Résumé :</h3>
-        {loading ? <p>⏳ Résumé en cours...</p> : <p>{summary}</p>}
+        {loading ? <p>⏳ Résumé en cours...</p> : <p style={{ whiteSpace: "pre-wrap" }}>{summary}</p>}
       </div>
 
       <div className="news-grid">
-        {filteredNews.map((item, index) => (
+        {currentArticles.map((item, index) => (
           <ArticleCard key={index} {...item} />
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? 'active' : ''}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
