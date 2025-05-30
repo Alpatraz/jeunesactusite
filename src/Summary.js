@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { firestore } from './firebase-config';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import './App.css';
@@ -38,56 +38,7 @@ function Summary() {
     getNews();
   }, []);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    let filtered = news;
-
-    if (regionFilter) {
-      filtered = filtered.filter(item =>
-        item.region && item.region.toLowerCase().includes(regionFilter.toLowerCase())
-      );
-    }
-
-    if (themeFilter) {
-      filtered = filtered.filter(item =>
-        item.theme && item.theme.toLowerCase().includes(themeFilter.toLowerCase())
-      );
-    }
-
-    if (dateFilter) {
-      filtered = filtered.filter(item => {
-        const publishedDate = new Date(item.publishedAt);
-        const currentDate = new Date();
-        switch (dateFilter) {
-          case '24h':
-            return currentDate - publishedDate < 24 * 60 * 60 * 1000;
-          case '7d':
-            return currentDate - publishedDate < 7 * 24 * 60 * 60 * 1000;
-          case '1m':
-            return currentDate - publishedDate < 30 * 24 * 60 * 60 * 1000;
-          default:
-            return true;
-        }
-      });
-    }
-
-    if (searchQuery) {
-      filtered = filtered.filter(item =>
-        item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.summary?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    setCurrentPage(1);
-    setFilteredNews(filtered);
-    if (filtered.length > 0) {
-      generateSummary(filtered);
-    } else {
-      setSummary("Aucun article ne correspond à votre sélection.");
-    }
-  }, [regionFilter, themeFilter, dateFilter, searchQuery, news, age]);
-
-  const generateSummary = async (filtered) => {
+  const generateSummary = useCallback(async (filtered) => {
     if (!filtered || filtered.length === 0) {
       setSummary("Aucun résumé généré.");
       return;
@@ -135,7 +86,55 @@ function Summary() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [regionFilter, themeFilter, dateFilter, age]);
+
+  useEffect(() => {
+    let filtered = news;
+
+    if (regionFilter) {
+      filtered = filtered.filter(item =>
+        item.region && item.region.toLowerCase().includes(regionFilter.toLowerCase())
+      );
+    }
+
+    if (themeFilter) {
+      filtered = filtered.filter(item =>
+        item.theme && item.theme.toLowerCase().includes(themeFilter.toLowerCase())
+      );
+    }
+
+    if (dateFilter) {
+      filtered = filtered.filter(item => {
+        const publishedDate = new Date(item.publishedAt);
+        const currentDate = new Date();
+        switch (dateFilter) {
+          case '24h':
+            return currentDate - publishedDate < 24 * 60 * 60 * 1000;
+          case '7d':
+            return currentDate - publishedDate < 7 * 24 * 60 * 60 * 1000;
+          case '1m':
+            return currentDate - publishedDate < 30 * 24 * 60 * 60 * 1000;
+          default:
+            return true;
+        }
+      });
+    }
+
+    if (searchQuery) {
+      filtered = filtered.filter(item =>
+        item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.summary?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setCurrentPage(1);
+    setFilteredNews(filtered);
+    if (filtered.length > 0) {
+      generateSummary(filtered);
+    } else {
+      setSummary("Aucun article ne correspond à votre sélection.");
+    }
+  }, [regionFilter, themeFilter, dateFilter, searchQuery, news, age, generateSummary]);
 
   const indexOfLastArticle = currentPage * articlesPerPage;
   const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
