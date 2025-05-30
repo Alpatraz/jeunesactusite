@@ -9,14 +9,13 @@ function Summary() {
   const [filteredNews, setFilteredNews] = useState([]);
   const [regionFilter, setRegionFilter] = useState('');
   const [themeFilter, setThemeFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('24h'); // filtre par défaut
+  const [dateFilter, setDateFilter] = useState('24h');
   const [searchQuery, setSearchQuery] = useState('');
   const [age, setAge] = useState(9);
   const [summary, setSummary] = useState('Chargement du résumé...');
   const [loading, setLoading] = useState(false);
   const [themes, setThemes] = useState([]);
   const [regions, setRegions] = useState([]);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [articlesPerPage, setArticlesPerPage] = useState(10);
 
@@ -39,6 +38,7 @@ function Summary() {
     getNews();
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let filtered = news;
 
@@ -93,9 +93,7 @@ function Summary() {
       return;
     }
 
-    // Intro dynamique selon les filtres
     let intro = "📰 Voici ce qui s’est passé récemment dans le monde :";
-
     if (regionFilter && themeFilter) {
       intro = `🌍 Voici les nouvelles sur **${themeFilter}** en **${regionFilter}**, ces derniers jours :`;
     } else if (regionFilter) {
@@ -103,7 +101,6 @@ function Summary() {
     } else if (themeFilter) {
       intro = `📌 Voici les dernières nouvelles dans le domaine **${themeFilter}** :`;
     }
-
     if (dateFilter === '24h') intro += ` (moins de 24h)`;
     if (dateFilter === '7d') intro += ` (cette semaine)`;
     if (dateFilter === '1m') intro += ` (ce mois-ci)`;
@@ -140,7 +137,6 @@ function Summary() {
     }
   };
 
-  // Pagination
   const indexOfLastArticle = currentPage * articlesPerPage;
   const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
   const currentArticles = filteredNews.slice(indexOfFirstArticle, indexOfLastArticle);
@@ -153,23 +149,14 @@ function Summary() {
       <div className="filters-container">
         <div>
           <label>Âge :</label>
-          <input
-            type="number"
-            value={age}
-            onChange={(e) => setAge(Number(e.target.value))}
-            min={6}
-            max={17}
-            style={{ width: "60px" }}
-          />
+          <input type="number" value={age} onChange={(e) => setAge(Number(e.target.value))} min={6} max={17} />
         </div>
 
         <div>
           <label>Région:</label>
           <select onChange={(e) => setRegionFilter(e.target.value)} value={regionFilter}>
             <option value="">Tous</option>
-            {regions.map((r, i) => (
-              <option key={i} value={r}>{r}</option>
-            ))}
+            {regions.map((r, i) => <option key={i} value={r}>{r}</option>)}
           </select>
         </div>
 
@@ -177,9 +164,7 @@ function Summary() {
           <label>Thème:</label>
           <select onChange={(e) => setThemeFilter(e.target.value)} value={themeFilter}>
             <option value="">Tous</option>
-            {themes.map((t, i) => (
-              <option key={i} value={t}>{t}</option>
-            ))}
+            {themes.map((t, i) => <option key={i} value={t}>{t}</option>)}
           </select>
         </div>
 
