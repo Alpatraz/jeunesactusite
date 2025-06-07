@@ -23,18 +23,66 @@ function Summary() {
     const getNews = async () => {
       const newsCollection = query(collection(firestore, 'actus'), orderBy("publishedAt", "desc"));
       const newsSnapshot = await getDocs(newsCollection);
-      const newsData = newsSnapshot.docs.map(doc => doc.data());
+
+      const normalizeRegion = (region) => {
+        if (!region) return null;
+        const r = region.trim().toLowerCase();
+        if (["test", "unknown", "n/a", "", "inconnue", "testland"].includes(r)) return null;
+        const map = {
+          "europe": "Europe",
+          "eu": "Europe",
+          "usa": "États-Unis",
+          "us": "États-Unis",
+          "united states": "États-Unis",
+          "canada": "Canada",
+          "quebec": "Québec",
+          "asie": "Asie",
+          "asia": "Asie",
+          "africa": "Afrique",
+          "afrique": "Afrique",
+          "latin america": "Amérique latine",
+          "south america": "Amérique du Sud",
+          "north america": "Amérique du Nord",
+          "monde": "Monde"
+        };
+        return map[r] || r.charAt(0).toUpperCase() + r.slice(1);
+      };
+
+      const newsData = newsSnapshot.docs.map(doc => {
+        const data = doc.data();
+
+        // Thème
+        let theme = data.theme?.trim().toLowerCase();
+        if (!theme || theme === "test") {
+          console.warn("🟠 Thème corrigé → 'Général' :", data.title);
+          theme = "Général";
+        } else {
+          theme = theme.charAt(0).toUpperCase() + theme.slice(1);
+        }
+
+        // Région
+        let region = normalizeRegion(data.region);
+        if (!region) {
+          console.warn("🟠 Région corrigée → 'Monde' :", data.title);
+          region = "Monde";
+        }
+
+        return { ...data, theme, region };
+      });
+
       setNews(newsData);
 
       const themeSet = new Set();
       const regionSet = new Set();
       newsData.forEach(item => {
-        if (item.theme) themeSet.add(item.theme.trim());
-        if (item.region) regionSet.add(item.region.trim());
+        themeSet.add(item.theme);
+        regionSet.add(item.region);
       });
+
       setThemes([...themeSet].sort());
       setRegions([...regionSet].sort());
     };
+
     getNews();
   }, []);
 
@@ -44,37 +92,49 @@ function Summary() {
       return;
     }
 
-    let intro = "📰 Voici ce qui s’est passé récemment dans le monde :";
+    let intro = `📰 Voici ce qui s’est passé`;
     if (regionFilter && themeFilter) {
-      intro = `🌍 Voici les nouvelles sur **${themeFilter}** en **${regionFilter}**, ces derniers jours :`;
+      intro += ` dans le domaine **${themeFilter}** en **${regionFilter}**`;
     } else if (regionFilter) {
-      intro = `🌍 Voici ce qui s’est passé récemment en **${regionFilter}** :`;
+      intro += ` en **${regionFilter}**`;
     } else if (themeFilter) {
-      intro = `📌 Voici les dernières nouvelles dans le domaine **${themeFilter}** :`;
+      intro += ` dans le domaine **${themeFilter}**`;
+    } else {
+      intro += ` récemment dans le monde`;
     }
+
     if (dateFilter === '24h') intro += ` (moins de 24h)`;
-    if (dateFilter === '7d') intro += ` (cette semaine)`;
-    if (dateFilter === '1m') intro += ` (ce mois-ci)`;
+    else if (dateFilter === '7d') intro += ` (cette semaine)`;
+    else if (dateFilter === '1m') intro += ` (ce mois-ci)`;
+    intro += ` :`;
 
     const groupedByTheme = {};
     filtered.slice(0, 15).forEach(item => {
-      const theme = item.theme?.trim() || "Autres";
-      if (!groupedByTheme[theme]) groupedByTheme[theme] = [];
-      groupedByTheme[theme].push(`- ${item.title}`);
+      const theme = item.theme?.trim();
+      const normalizedTheme = theme.charAt(0).toUpperCase() + theme.slice(1);
+      if (!groupedByTheme[normalizedTheme]) groupedByTheme[normalizedTheme] = [];
+      groupedByTheme[normalizedTheme].push(`- ${item.title}`);
     });
 
     const thematicBlocks = Object.entries(groupedByTheme).map(([theme, articles]) => {
       return `\n\n🟢 ${theme}\n${articles.slice(0, 3).join('\n')}`;
     }).join('');
 
-    const fullPrompt = `Résume les actualités suivantes pour un enfant de ${age} ans. Utilise un langage clair et adapté à son âge. Conserve les thèmes séparés.\n\n${intro}\n${thematicBlocks}`;
+    let prompt = "";
+    if (age <= 8) {
+      prompt = `Résume ces nouvelles pour un enfant de ${age} ans. Utilise des phrases TRÈS simples, des mots familiers, un ton rassurant. N’explique pas tout : simplifie.\n\n${intro}\n${thematicBlocks}`;
+    } else if (age <= 11) {
+      prompt = `Fais un résumé adapté à un enfant de ${age} ans. Utilise des phrases courtes et claires. Aide à comprendre ce qu’il se passe dans le monde.\n\n${intro}\n${thematicBlocks}`;
+    } else {
+      prompt = `Rédige un résumé accessible pour un jeune de ${age} ans. Utilise un langage compréhensible, structuré, pédagogique.\n\n${intro}\n${thematicBlocks}`;
+    }
 
     setLoading(true);
     try {
       const response = await fetch("https://jeunes-actu-guillaumese.replit.app/api/generate-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: fullPrompt })
+        body: JSON.stringify({ prompt })
       });
 
       const data = await response.json();
@@ -99,24 +159,19 @@ function Summary() {
 
     if (themeFilter) {
       filtered = filtered.filter(item =>
-        item.theme && item.theme.toLowerCase().includes(themeFilter.toLowerCase())
+        item.theme && item.theme.toLowerCase() === themeFilter.toLowerCase()
       );
     }
 
     if (dateFilter) {
       filtered = filtered.filter(item => {
-        const publishedDate = new Date(item.publishedAt);
+        const publishedDate = item.publishedAt?.toDate?.() || new Date(item.publishedAt);
         const currentDate = new Date();
-        switch (dateFilter) {
-          case '24h':
-            return currentDate - publishedDate < 24 * 60 * 60 * 1000;
-          case '7d':
-            return currentDate - publishedDate < 7 * 24 * 60 * 60 * 1000;
-          case '1m':
-            return currentDate - publishedDate < 30 * 24 * 60 * 60 * 1000;
-          default:
-            return true;
-        }
+        const diff = currentDate - publishedDate;
+        if (dateFilter === '24h') return diff < 24 * 60 * 60 * 1000;
+        if (dateFilter === '7d') return diff < 7 * 24 * 60 * 60 * 1000;
+        if (dateFilter === '1m') return diff < 30 * 24 * 60 * 60 * 1000;
+        return true;
       });
     }
 
@@ -205,7 +260,7 @@ function Summary() {
 
       <div className="news-grid">
         {currentArticles.map((item, index) => (
-          <ArticleCard key={index} {...item} />
+          <ArticleCard key={index} {...item} age={age} />
         ))}
       </div>
 

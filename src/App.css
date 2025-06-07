@@ -75,34 +75,87 @@ h1, h2, h3 {
   font-size: 16px;
 }
 
+/* Résumé thématique */
+.summary-box p {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 16px;
+  color: #333;
+}
+
 .card-list {
   list-style: none;
   padding: 0;
 }
 
-.news-card {
+/* === ARTICLE CARD + THEME BADGE === */
+.article-card {
+  position: relative;
   background-color: white;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.news-card h4 {
-  margin-top: 0;
+.article-title {
+  font-size: 18px;
+  margin-bottom: 10px;
   color: #0077cc;
 }
 
-.news-card a {
-  display: inline-block;
-  margin-top: 10px;
-  text-decoration: none;
+.article-summary {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #555;
+}
+
+.article-tags {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #777;
+}
+
+.article-tag {
+  background-color: #f1f1f1;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-weight: 500;
+}
+
+.article-link {
   color: #0077cc;
   font-weight: bold;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
-.news-card a:hover {
-  text-decoration: underline;
+.article-link:hover {
+  color: #005fa3;
+}
+
+.theme-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: #cccccc;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.theme-icon {
+  font-size: 16px;
 }
 
 /* === STYLES POUR LES JEUX D'ACTUALITÉ === */
@@ -271,6 +324,7 @@ h1, h2, h3 {
   margin-right: auto;
   text-align: center;
 }
+
 .age-filter-container {
   display: flex;
   align-items: center;
@@ -290,8 +344,8 @@ h1, h2, h3 {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-/* === SECTION ÂGE ET INSTRUCTIONS === */
 
+/* === INSTRUCTIONS === */
 .quiz-instructions {
   margin-top: 30px;
   background-color: #fff4e6;
@@ -335,12 +389,12 @@ h1, h2, h3 {
   color: #444;
 }
 
-/* === EFFET DE TRANSITION === */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* === MAP === */
 .custom-marker {
   display: flex;
   justify-content: center;
@@ -364,7 +418,6 @@ h1, h2, h3 {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-/* Optionnel : plein écran mobile */
 @media (max-width: 768px) {
   .map-container h1 {
     font-size: 1.5rem;
@@ -405,12 +458,4 @@ h1, h2, h3 {
   background-color: #0077cc;
   color: white;
   pointer-events: none;
-}
-
-/* === Résumé thématique === */
-.summary-box p {
-  white-space: pre-wrap;
-  line-height: 1.6;
-  font-size: 16px;
-  color: #333;
 }
