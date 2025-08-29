@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { features } from './config/features';
 import './Navbar.css';
 
-function Navbar() {
+export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+
+  const close = () => setMenuOpen(false);
+  const isActive = (path) => (location.pathname === path ? 'active' : '');
 
   return (
     <nav className="navbar">
@@ -13,49 +17,46 @@ function Navbar() {
           <span role="img" aria-label="journal" className="logo-icon">📰</span>
           JEUNES <span>ACTU</span>
         </div>
+
         <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
           ☰
         </button>
+
         <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
-          <Link
-            to="/"
-            className={location.pathname === '/' ? 'active' : ''}
-            onClick={() => setMenuOpen(false)}
-          >
+          {/* Résumé */}
+          <Link to="/" className={isActive('/')} onClick={close}>
             Résumé
           </Link>
-          <Link
-            to="/jeu"
-            className={location.pathname === '/jeu' ? 'active' : ''}
-            onClick={() => setMenuOpen(false)}
-          >
-            Jeu
-          </Link>
-          <Link
-            to="/dossiers"
-            className={location.pathname === '/dossiers' ? 'active' : ''}
-            onClick={() => setMenuOpen(false)}
-          >
-            Dossiers
-          </Link>
-          <Link
-            to="/carte"
-            className={location.pathname === '/carte' ? 'active' : ''}
-            onClick={() => setMenuOpen(false)}
-          >
-            Carte
-          </Link>
-          <Link
-            to="/sources"
-            className={location.pathname === '/sources' ? 'active' : ''}
-            onClick={() => setMenuOpen(false)}
-          >
-            Sources
-          </Link>
+
+          {/* Jeu */}
+          {features.jeu && (
+            <Link to="/jeu" className={isActive('/jeu')} onClick={close}>
+              Jeu
+            </Link>
+          )}
+
+          {/* Dossiers */}
+          {features.dossiers && (
+            <Link to="/dossiers" className={isActive('/dossiers')} onClick={close}>
+              Dossiers
+            </Link>
+          )}
+
+          {/* Carte */}
+          {features.carte && (
+            <Link to="/carte" className={isActive('/carte')} onClick={close}>
+              Carte
+            </Link>
+          )}
+
+          {/* Sources */}
+          {features.sources && (
+            <Link to="/sources" className={isActive('/sources')} onClick={close}>
+              Sources
+            </Link>
+          )}
         </div>
       </div>
     </nav>
   );
 }
-
-export default Navbar;
